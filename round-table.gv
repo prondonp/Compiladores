@@ -1,0 +1,44 @@
+// Arbol Sintactico
+digraph {
+	B [label=INICIO]
+	D [label=ASIGNACION]
+	B -> D
+	C [label=INICIO]
+	B -> C
+	F [label=var_entero]
+	D -> F
+	E [label=D]
+	D -> E
+	I [label=id]
+	E -> I
+	H [label=igual]
+	E -> H
+	G [label=E]
+	E -> G
+	J [label="N'"]
+	G -> J
+	L [label=OPERACION]
+	J -> L
+	K [label=Z]
+	J -> K
+	M [label=A]
+	L -> M
+	O [label=num]
+	M -> O
+	N [label=C]
+	M -> N
+	Q [label=operador_sum]
+	N -> Q
+	P [label=A]
+	N -> P
+	S [label=num]
+	P -> S
+	R [label=C]
+	P -> R
+	T [label="ε"]
+	R -> T
+	U [label="ε"]
+	K -> U
+	V [label=fin_codigo]
+	C -> V
+}
