@@ -395,6 +395,7 @@ def assembly_pointer(var, nodo):
     para_escribir_final =  para_escribir1 + ":    .word    0:1"
     cassembly.write(para_escribir_final)
 
+
 def assembly_body(lista):
   cassembly.write("\n.text")
   cassembly.write("\nmain:")
@@ -406,14 +407,30 @@ def assembly_body(lista):
     cassembly.write("\n\tli $a0, " + lista_numeros[1])
     cassembly.write("\n\tlw $t1 4($sp) \n\tadd $a0 $t1 $a0 \n\tadd $sp $sp 4")
     cassembly.write("\n\tla  $t1, var_" + lista[x]["nombre_variable"] + "\n\tsw  $a0, 0($t1)")
-    cassembly.write("\n\tli $v0 1"	+ "\n\tsyscall")
-    cassembly.write("\n\tjr $ra  ")
-    cassembly.close()
+    #cassembly.write("\n\tli $v0 1"	+ "\n\tsyscall")
+
+def if_elseASSEMBLY(lista):
+  lista_numeros = []
+  bus_val(lista[0].children[-2], lista_numeros)
+  lista_tamaño = range(len(lista_numeros))
+  for x in lista_tamaño:
+    print(lista_numeros)
+    if len(lista_numeros) == 1:
+      cassembly.write("\n\tli $a0, " + lista_numeros[0])
+    else:
+      cassembly.write("\n\tli $a0, " + lista_numeros[0])
+      cassembly.write("\n\tsw $a0, 0($sp) \n\tadd $sp, $sp, -4 ")
+      lista_numeros.pop(0)
+  cassembly.write("\n\tlw $t1 4($sp)")
+  cassembly.write("\n\tblt $a0, $t1, label_true")
   
 lista_probar = []
+lista_condicionales = []
 
-def checkvardef(root, contador_linea, funcion_padre, tabla_simbolos, lista_probar):
+def checkvardef(root, contador_linea, funcion_padre, tabla_simbolos, lista_probar, lista_condicionales):
   for child in reversed(root.children):
+    if child.node_st.symbol == "CONDICIONAL":
+      lista_condicionales.append(child)
     if child.node_st.symbol == "definir":
       contador_linea = child.line
       funcion_padre = child.father.children[-2].lexeme
@@ -450,10 +467,14 @@ def checkvardef(root, contador_linea, funcion_padre, tabla_simbolos, lista_proba
           print("Se usó la variable ", child.lexeme)
         else:
           print("Error Semántico")
-    checkvardef(child, contador_linea, funcion_padre, tabla_simbolos, lista_probar)
-checkvardef(nodo_raiz, 0, "main", tabla_simbolos, lista_probar)
+    checkvardef(child, contador_linea, funcion_padre, tabla_simbolos, lista_probar, lista_condicionales)
+checkvardef(nodo_raiz, 0, "main", tabla_simbolos, lista_probar, lista_condicionales)
+
 
 assembly_body(lista_probar)
+if_elseASSEMBLY(lista_condicionales)
+cassembly.write("\n\tjr $ra  ")
+cassembly.close()
 
 def recarbol(nodo_raiz):
   for child in reversed(nodo_raiz.children):
